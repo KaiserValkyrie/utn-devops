@@ -15,6 +15,9 @@ Vagrant.configure("2") do |config|
 
    #Selecciono la maquina virtual que quiero crear
   config.vm.box = "ubuntu/xenial64"
+  
+  #Cheque que la imagen este actualizada cada vez qeu se ejecute vagrant
+  config.vm.box_check_update = true
 
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -65,13 +68,22 @@ Vagrant.configure("2") do |config|
   #   vb.memory = "1024"
   # end
   
+  #aumento el tiemeo de timeout de inicio de la maquina virtual
+  config.vm.boot_timeout = 1600
+  
   #Configuraciones particulares de la maquina virtual
   config.vm.provider "virtualbox" do |vb|
+	#Muetsra la consola de la maquina virtual
+	vb.gui = true
+	
     #se le asigna 1GB de memoria la maquina virtual
-    vb.memory = "1024"
-	 
+    vb.memory = "4096"
+	
+	#Asigno 4 CPUs
+	vb.cpus = 4
+	
 	#Se le asigna un nombre
-	vb.name = "Creada_by_vangrant_:)"
+	vb.name = "Creada_por_vangrant"
   end
   #
   
@@ -87,10 +99,15 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
 
-  config.vm.provision "shell", inline: <<-SHELL
-	apt-get update
-	apt-get install -y apache2
-  SHELL
+  #config.vm.provision "shell", inline: <<-SHELL
+  #	apt-get update
+  #	apt-get install -y apache2
+  #SHELL
   
+  config.vm.provision "file", source: "Configs/devops.site.conf", destination: "/tmp/devops.site.conf"
+  
+  #Script que se va a ejecutar cada vez que inicializamos la maquina virtual
+  #Actualiza el catalogo, instala el apache, baja el codigo de la app.
+  config.vm.provision "shell", path: "VagrantProvision.sh"
   
 end
